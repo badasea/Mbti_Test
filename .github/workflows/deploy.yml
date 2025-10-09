@@ -54,7 +54,7 @@ jobs:
     environment:
       # ⭐ 핵심: 브랜치에 따라 배포될 URL을 다르게 설정
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}${{ github.ref_name == 'develop' && '/dev' || '' }}
     steps:
       - name: Deploy to GitHub Pages 🚀
         id: deployment
