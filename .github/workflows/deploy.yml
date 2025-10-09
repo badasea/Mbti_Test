@@ -36,23 +36,15 @@ jobs:
       - name: Build project 🔨
         # ⭐ 핵심: 브랜치에 따라 빌드 명령어를 다르게 실행!
         # main 브랜치면 npm run build 실행
-        run: |
-          if [ $GITHUB_REF_NAME == 'main' ]; then
-            npm run build
-          else
-            npm run build:dev
-          fi
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ github.ref_name == 'main' && '/Mbti_Test' || '/Mbti_Test/dev' }}
+        run: npm run build
 
       - name: Upload artifact ⬆️
         uses: actions/upload-pages-artifact@v3 # 5. 빌드 결과물을 GitHub Pages에 배포할 수 있도록 업로드
         with:
           # ⭐ 핵심: 브랜치에 따라 결과물을 다른 경로에 저장
-          path: |
-            if [ $GITHUB_REF_NAME == 'main' ]; then
-              ./out
-            else
-              ./out/dev
-            fi
+          path: ./out
 
   # 배포 작업
   deploy:
@@ -62,7 +54,7 @@ jobs:
     environment:
       # ⭐ 핵심: 브랜치에 따라 배포될 URL을 다르게 설정
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}${{ github.ref_name == 'develop' && '/dev' || '' }}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages 🚀
         id: deployment
