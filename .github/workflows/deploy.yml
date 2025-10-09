@@ -1,21 +1,21 @@
 # 워크플로우의 이름
-name: Deploy Next.js to GitHub Pages
+name: Deploy Next.js to GitHub Pages by Branch
 
 # 언제 이 워크플로우를 실행할 것인지 정의
 on:
   push:
     branches:
-      - main # main 브랜치에 push 이벤트가 발생했을 때 실행
-  # (선택사항) Actions 탭에서 수동으로 실행할 수도 있도록 설정
+      - main # main 브랜치에 push
+      - develop # develop 브랜치에 push
   workflow_dispatch:
 
-# 작업(Job)을 수행할 때 필요한 권한 설정
+# 작업에 필요한 권한 설정
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 어떤 작업(Job)을 수행할 것인지 정의
+# 수행할 작업(Job) 정의
 jobs:
   # 빌드 작업
   build:
@@ -34,13 +34,17 @@ jobs:
         run: npm install # 3. 의존성 패키지 설치
 
       - name: Build project 🔨
-        # basePath 설정을 위해 package.json의 build 스크립트를 수정할 필요 없음
-        run: npm run build # 4. 프로젝트 빌드 (out 폴더에 결과물이 생성됨)
+        # ⭐ 핵심: 브랜치에 따라 빌드 명령어를 다르게 실행!
+        # main 브랜치면 npm run build 실행
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ github.ref_name == 'main' && '/Mbti_Test' || '/Mbti_Test/dev' }}
+        run: npm run build
 
       - name: Upload artifact ⬆️
         uses: actions/upload-pages-artifact@v3 # 5. 빌드 결과물을 GitHub Pages에 배포할 수 있도록 업로드
         with:
-          path: ./out # Next.js의 빌드 결과물 폴더
+          # ⭐ 핵심: 브랜치에 따라 결과물을 다른 경로에 저장
+          path: ./out
 
   # 배포 작업
   deploy:
@@ -48,8 +52,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
+      # ⭐ 핵심: 브랜치에 따라 배포될 URL을 다르게 설정
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}${{ github.ref_name == 'develop' && 'dev' || '' }}
     steps:
       - name: Deploy to GitHub Pages 🚀
         id: deployment
