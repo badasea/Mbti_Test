@@ -1,6 +1,11 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import dynamic from "next/dynamic";
+
+const MbtiContainer = dynamic(() => import("./@contatiner/Container"), {
+  ssr: false,
+});
 
 export default function Home() {
-  return <div className={styles.page}>GitHub Action 테스트 완료.</div>;
+  return <MbtiContainer />;
 }
