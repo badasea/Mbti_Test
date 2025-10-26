@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # 배포의 이름
+  name: mbti-app-deployment
+spec:
+  # Pod를 몇 개 유지할 것인지
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mbti-app
+  template:
+    metadata:
+      labels:
+        # 이 Pod에 mbti-app이라는 이름표를 붙임
+        app: mbti-app
+    spec:
+      containers:
+        # 실행할 컨테이너 정보
+        - name: mbti-container
+          # 4탄에서 만든 Nginx 이미지를 Docker Hub에서 가져옴
+          image: <여러분의_도커허브_ID>/mbti-static-app:latest
+          ports:
+            # 컨테이너가 80번 포트를 사용
+            - containerPort: 80

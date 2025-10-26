@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # 서비스의 이름
+  name: mbti-app-service
+spec:
+  # 서비스 타입을 NodePort로 설정 (외부에서 접근할 수 있게 함)
+  type: NodePort
+  selector:
+    # 이름표가 mbti-app인 Pod들에게 요청을 전달
+    app: mbti-app
+  ports:
+    - protocol: TCP
+      # 서비스의 80번 포트로 오는 요청을
+      port: 80
+      # 컨테이너의 80번 포트로 전달
+      targetPort: 80
